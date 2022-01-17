@@ -1,0 +1,58 @@
+<launch>
+
+    <group ns="arducam" clear_params="true">
+        <arg name="width" value="2560" />
+        <arg name="height" value="800" />
+        <arg name="device" value="0" />
+        <arg name="frame_id" value="cam0" /> <!--Topic frame_id. -->
+        <arg name="pixelformat" value="GREY" />
+        <arg name="flip" value="True" />
+        <arg name="framerate" value="20" />
+        <arg name="exposure" value="500" />
+
+        <node name="arducam_stereo_camera" pkg="arducam_stereo_camera" type="arducam_stereo_camera.py" output="screen">
+            <param name="width" type="int" value="$(arg width)" />
+            <param name="height" type="int" value="$(arg height)" />
+            <param name="device" type="int" value="$(arg device)" />
+            <param name="pixelformat" type="string" value="$(arg pixelformat)" />
+            <param name="flip" type="bool" value="$(arg flip)" />
+            <param name="framerate" type="int" value="$(arg framerate)" />
+            <param name="exposure" type="int" value="$(arg exposure)" />
+
+            <param name="left/camera_info_url" type="string" value="file://$(find arducam_stereo_camera)/example-left.yaml" />
+            <param name="right/camera_info_url" type="string" value="file://$(find arducam_stereo_camera)/example-right.yaml" />
+            <param name="frame_id" value="$(arg frame_id)" />
+        </node>
+
+        <node name="left_throttler" type="throttle" pkg="topic_tools" args="messages left/image_raw 10 left/image_throttled" />
+        <node name="right_throttler" type="throttle" pkg="topic_tools" args="messages right/image_raw 10 right/image_throttled" />
+    </group>
+
+    <node name="vins" pkg="vins" type="vins_node" args="$(env HOME)/ros_arducam/JetSonCAM_9281.yaml">
+        <remap from="/vins/arducam_pose" to="/mavros/vision_pose/pose" />
+    </node>
+
+    <!-- <node name="loopfuse" pkg="loop_fusion" type="loop_fusion_node" args="$(env HOME)/ros_arducam/JetSonCAM_9281.yaml">
+    </node> -->
+
+    <!-- transform world frame to map (global) frame-->
+    <node pkg="tf" type="static_transform_publisher" name="fcutg" args="0 0 0 0 0 0 map world 100" />
+
+    <!-- transform base_link frame to map (global) frame for mavros-->
+    <node pkg="tf" type="static_transform_publisher" name="fcutf" args="0 0 0 0 0 0 map base_link 100" />
+
+    <!-- Mavros connection to ArduPilot via mavlink-router on port 15000 --> 
+    <include file="$(find mavros)/launch/node.launch">
+        <arg name="pluginlists_yaml" value="$(find mavros)/launch/apm_pluginlists.yaml" />
+	    <arg name="config_yaml" value="$(find mavros)/launch/apm_config.yaml" />
+	    <arg name="fcu_url" value="udp://:15000@" />
+	    <arg name="gcs_url" value="" />
+	    <arg name="tgt_system" value="1" />
+	    <arg name="tgt_component" value="1" />
+	    <arg name="log_output" value="screen" />
+	    <arg name="fcu_protocol" value="v2.0" />
+	    <arg name="respawn_mavros" value="false" />
+
+    </include>
+
+</launch>
