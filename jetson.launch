@@ -8,7 +8,7 @@
         <arg name="pixelformat" value="GREY" />
         <arg name="flip" value="True" />
         <arg name="framerate" value="20" />
-        <arg name="exposure" value="500" />
+        <arg name="exposure" value="2000" />
 
         <node name="arducam_stereo_camera" pkg="arducam_stereo_camera" type="arducam_stereo_camera.py" output="screen">
             <param name="width" type="int" value="$(arg width)" />
@@ -24,12 +24,13 @@
             <param name="frame_id" value="$(arg frame_id)" />
         </node>
 
-        <node name="left_throttler" type="throttle" pkg="topic_tools" args="messages left/image_raw 10 left/image_throttled" />
-        <node name="right_throttler" type="throttle" pkg="topic_tools" args="messages right/image_raw 10 right/image_throttled" />
+        <!-- throttle image streams to 50%, ie 10fps -->
+        <node name="left_throttler" type="drop" pkg="topic_tools" args="left/image_raw 1 2 left/image_throttled" />
+        <node name="right_throttler" type="drop" pkg="topic_tools" args="right/image_raw 1 2 right/image_throttled" />
     </group>
 
-    <node name="vins" pkg="vins" type="vins_node" args="$(env HOME)/ros_arducam/JetSonCAM_9281.yaml">
-        <remap from="/vins/arducam_pose" to="/mavros/vision_pose/pose" />
+    <node name="vins" pkg="vins" type="vins_node" args="$(env HOME)/ros_arducamlite/JetSonCAM_9281.yaml">
+        <remap from="/vins/pub_ardupilot_pose" to="/mavros/vision_pose/pose" />
     </node>
 
     <!-- <node name="loopfuse" pkg="loop_fusion" type="loop_fusion_node" args="$(env HOME)/ros_arducam/JetSonCAM_9281.yaml">
