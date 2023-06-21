@@ -25,7 +25,7 @@ It is a "lighter" version of VINS-GPU (https://github.com/pjrambo/VINS-Fusion-gp
 
 # Installation
 
-Follow the instructions at https://www.arducam.com/docs/camera-for-jetson-nano/multiple-cameras-on-the-jetson/how-to-use-stereo-camera-to-perform-location-with-visual-slam/#35-algorithm-related-dependencies-installation, noting the following changes:
+Follow the instructions at https://www.arducam.com/doc-old/camera-for-jetson-nano/multiple-cameras-on-the-jetson/how-to-use-stereo-camera-to-perform-location-with-visual-slam/#ftoc-heading-20, noting the following changes:
 
 - Use `git clone https://github.com/stephendade/Camarray_HAT.git` repo in place of ``git clone -b ov9281_stereo https://github.com/ArduCAM/Camarray_HAT.git``
 - Use `git clone https://github.com/stephendade/Nvidia_Jetson_ROS_SLAM_VINS.git` repo in place of ``git clone https://github.com/ArduCAM/Nvidia_Jetson_ROS_SLAM_VINS.git``
